@@ -1,0 +1,112 @@
+#include <stdio.h>
+
+#define PRODUCT 5
+
+int main() {
+    int in[PRODUCT] = {0};
+    int out[PRODUCT] = {0};
+    int stock[PRODUCT] = {0};
+
+    int menu;
+
+    while (1) {
+        printf("\n원하는 메뉴를 선택하세요.(1. 입고, 2. 판매, 3. 상품현황, 4. 종료)\n> ");
+        scanf("%d", &menu);
+
+        if (menu == 1) {
+            int select;
+            printf("(입력)입고수량 입력 : 전체 상품 입고수량 입력 1, 개별 상품 입력 2 를 선택\n> ");
+            scanf("%d", &select);
+
+            if (select == 1) {
+                printf("입력 > ");
+                for (int i = 0; i < PRODUCT; i++) {
+                    int qty;
+                    scanf("%1d", &qty);
+                    in[i] += qty;
+                    stock[i] = in[i] - out[i];
+                }
+            } else if (select == 2) {
+                int id, qty;
+                printf("입력 > 제품ID, 입고수량 : ");
+                scanf("%d %d", &id, &qty);
+                if (id >= 1 && id <= PRODUCT) {
+                    in[id - 1] += qty;
+                    stock[id - 1] = in[id - 1] - out[id - 1];
+                } else printf("잘못된 ID 입니다.\n");
+            }
+        }
+
+        else if (menu == 2) {
+            int select;
+            printf("(입력)판매수량 입력 : 전체 상품 판매수량 입력 1, 개별 상품 입력 2 를 선택\n> ");
+            scanf("%d", &select);
+
+            if (select == 1) {
+                printf("입력 > ");
+                for (int i = 0; i < PRODUCT; i++) {
+                    int qty;
+                    scanf("%1d", &qty);
+                    if (qty <= stock[i]) {
+                        out[i] += qty;
+                        stock[i] -= qty;
+                    } else {
+                        printf("상품 ID %d : 재고부족(%d)\n", i + 1, stock[i]);
+                    }
+                }
+            } else if (select == 2) {
+                int id, qty;
+                printf("입력 > 제품ID, 판매수량 : ");
+                scanf("%d %d", &id, &qty);
+                if (id >= 1 && id <= PRODUCT) {
+                    if (qty <= stock[id - 1]) {
+                        out[id - 1] += qty;
+                        stock[id - 1] -= qty;
+                    } else {
+                        printf("상품 ID %d : 재고부족(%d)\n", id, stock[id - 1]);
+                    }
+                } else printf("잘못된 ID 입니다.\n");
+            }
+        }
+
+        else if (menu == 3) {
+            int total_stock = 0, total_out = 0, total_in = 0;
+            for (int i = 0; i < PRODUCT; i++) {
+                total_in += in[i];
+                total_out += out[i];
+                total_stock += stock[i];
+            }
+            
+            double ratio = total_in > 0 ? (double)total_out / total_in * 100 : 0;
+
+            int max_idx = 0, min_idx = 0;
+            for (int i = 1; i < PRODUCT; i++) {
+                if (out[i] > out[max_idx]) max_idx = i;
+                if (out[i] < out[min_idx]) min_idx = i;
+            }
+
+            printf("재고수량 : ");
+            for (int i = 0; i < PRODUCT; i++) printf("%d", stock[i]);
+            printf("\n총 판매량 : %d (판매율 %.2f%%)\n", total_out, ratio);
+            printf("가장 많이 판매된 상품 : ID %d, 판매량 %d\n", max_idx + 1, out[max_idx]);
+            printf("가장 적게 판매된 상품 : ID %d, 판매량 %d\n", min_idx + 1, out[min_idx]);
+
+            for (int i = 0; i < PRODUCT; i++) {
+                if (stock[i] <= 2) {
+                    printf("상품 ID %d : 재고부족(%d)\n", i + 1, stock[i]);
+                }
+            }
+        }
+
+        else if (menu == 4) {
+            printf("프로그램을 종료합니다.\n");
+            break;
+        }
+
+        else {
+            printf("잘못된 메뉴입니다.\n");
+        }
+    }
+
+    return 0;
+}
